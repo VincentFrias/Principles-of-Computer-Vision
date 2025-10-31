@@ -57,19 +57,6 @@ O filtro implementado em `detec_board.py` usa o seguinte *kernel* para detecçã
 
 A **manipulação de gama**, ou **correção de gama**, é uma técnica fundamental no processamento de imagens usada para ajustar a **luminosidade não linear** dos pixels. Câmeras, sensores e monitores possuem respostas luminosas diferentes, e a correção de gama serve para compensar essas variações e **melhorar o contraste perceptível** da imagem.
 
-A transformação de gama segue a relação matemática:
-
-\[
-I_{\text{out}} = I_{\text{in}}^{\gamma}
-\]
-
-onde:
-- \( I_{\text{in}} \) é o valor de entrada do pixel (normalizado entre 0 e 1),
-- \( I_{\text{out}} \) é o valor resultante após a correção,
-- \( \gamma \) é o fator de correção gama.
-
-
-
 -> **Compreendendo o efeito do gama**
 
 O gráfico abaixo mostra como o valor de saída (eixo Y) se relaciona ao valor de entrada (eixo X) para diferentes valores de \( \gamma \):
