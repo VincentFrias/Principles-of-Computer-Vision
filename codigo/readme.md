@@ -43,8 +43,10 @@
 
 O filtro implementado em `detec_board.py` usa o seguinte *kernel* para detecção de bordas horizontais (componente $G_x$, que enfatiza bordas verticais):
 
-$$
-\text{kernel\_detec} = \begin{pmatrix} 1 & 0 & -1 \\ 2 & 0 & -2 \\ 1 & 0 & -1 \end{pmatrix}
+<p align="center"\>
+    <img src="img/temp/matriz_kernel.png" width="250"/\>
+</p\>
+
 $$  * Este *kernel* corresponde ao filtro de Sobel na direção $x$.
 
 * A demonstração em `detec_board.py` compara a aplicação do filtro usando a função `cv2.filter2D` e uma implementação manual com *loop* e *padding*. A implementação manual inclui a conversão para `np.int16` para permitir valores negativos do gradiente (diferença) antes do *clip* e conversão final para `np.uint8`.
