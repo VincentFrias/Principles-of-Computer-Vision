@@ -6,6 +6,7 @@ from PIL import Image
 # Carrega imagem e converte para cinza
 img = cv2.imread("img/img01.jpeg")
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+cv2.imwrite("img/img01.jpeg",gray)
 
 altura, largura = gray.shape
 freq = [0] * 256            # frequência normalizada
