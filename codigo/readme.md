@@ -47,6 +47,123 @@ O filtro implementado em `detec_board.py` usa o seguinte *kernel* para detecçã
     <img src="img/temp/matriz_kernel.png" width="250"/\>
 </p\>
 
-$$  * Este *kernel* corresponde ao filtro de Sobel na direção $x$.
+* Este *kernel* corresponde ao filtro de Sobel na direção $x$.
 
 * A demonstração em `detec_board.py` compara a aplicação do filtro usando a função `cv2.filter2D` e uma implementação manual com *loop* e *padding*. A implementação manual inclui a conversão para `np.int16` para permitir valores negativos do gradiente (diferença) antes do *clip* e conversão final para `np.uint8`.
+
+## **Manipulação de Gama (Correção de Gama)**
+
+A **manipulação de gama**, ou **correção de gama**, é uma técnica fundamental no processamento de imagens usada para ajustar a **luminosidade não linear** dos pixels. Câmeras, sensores e monitores possuem respostas luminosas diferentes, e a correção de gama serve para compensar essas variações e **melhorar o contraste perceptível** da imagem.
+
+A transformação de gama segue a relação matemática:
+
+\[
+I_{\text{out}} = I_{\text{in}}^{\gamma}
+\]
+
+onde:
+- \( I_{\text{in}} \) é o valor de entrada do pixel (normalizado entre 0 e 1),
+- \( I_{\text{out}} \) é o valor resultante após a correção,
+- \( \gamma \) é o fator de correção gama.
+
+---
+
+### **Compreendendo o efeito do gama**
+
+O gráfico abaixo mostra como o valor de saída (eixo Y) se relaciona ao valor de entrada (eixo X) para diferentes valores de \( \gamma \):
+
+<p align="center">
+    <img src="img/Gamma-Correction-Graph.jpg" width="500"/>
+</p>
+
+ **Interpretação:**
+- Curvas **côncavas** (γ < 1) — *clareiam* a imagem, realçando detalhes em regiões escuras.  
+- Curvas **lineares** (γ = 1) — mantêm a imagem original.  
+- Curvas **convexas** (γ > 1) — *escurecem* a imagem, realçando detalhes em áreas claras.
+
+Essas transformações permitem **controlar o contraste dinâmico** e adaptar a imagem à forma como o olho humano percebe a luz.
+
+---
+
+###  **Importância da Correção de Gama**
+
+Ajustar o gama é essencial em diversas áreas:
+
+-  **Melhora o contraste dinâmico:**  
+  Gamas menores (< 1) tornam a imagem mais clara, evidenciando detalhes em sombras.  
+
+-  **Realça regiões escuras ou claras:**  
+  Gamas maiores (> 1) tornam a imagem mais escura, evitando o “lavado” causado por brilho excessivo.  
+
+-  **Correção de exibição:**  
+  Essencial para calibrar imagens exibidas em diferentes telas, evitando distorções de luminosidade.  
+
+-  **Visão computacional e machine learning:**  
+  Usado como pré-processamento para melhorar o reconhecimento de padrões e objetos sob diferentes condições de iluminação.
+
+---
+
+###  **Implementação prática**
+
+O arquivo [`gama_manipulation.py`](gama_manipulation.py) demonstra a aplicação manual da correção de gama em tons de cinza, processando cada pixel individualmente:
+
+---
+
+## **Manipulação de Gama (Correção de Gama)**
+
+A **manipulação de gama**, ou **correção de gama**, é uma técnica fundamental no processamento de imagens usada para ajustar a **luminosidade não linear** dos pixels. Câmeras, sensores e monitores possuem respostas luminosas diferentes, e a correção de gama serve para compensar essas variações e **melhorar o contraste perceptível** da imagem.
+
+A transformação de gama segue a relação matemática:
+
+\[
+I_{\text{out}} = I_{\text{in}}^{\gamma}
+\]
+
+onde:
+- \( I_{\text{in}} \) é o valor de entrada do pixel (normalizado entre 0 e 1),
+- \( I_{\text{out}} \) é o valor resultante após a correção,
+- \( \gamma \) é o fator de correção gama.
+
+
+
+-> **Compreendendo o efeito do gama**
+
+O gráfico abaixo mostra como o valor de saída (eixo Y) se relaciona ao valor de entrada (eixo X) para diferentes valores de \( \gamma \):
+
+<p align="center">
+    <img src="img/temp/Gamma-Correction-Graph.jpg" width="500"/>
+</p>
+
+-> **Interpretação:**
+- Curvas **côncavas** (γ < 1) — *clareiam* a imagem, realçando detalhes em regiões escuras.  
+- Curvas **lineares** (γ = 1) — mantêm a imagem original.  
+- Curvas **convexas** (γ > 1) — *escurecem* a imagem, realçando detalhes em áreas claras.
+
+Essas transformações permitem **controlar o contraste dinâmico** e adaptar a imagem à forma como o olho humano percebe a luz.
+
+-> **Importância da Correção de Gama**
+
+Ajustar o gama é essencial em diversas áreas:
+
+-  **Melhora o contraste dinâmico:**  
+  Gamas menores (< 1) tornam a imagem mais clara, evidenciando detalhes em sombras.  
+
+-  **Realça regiões escuras ou claras:**  
+  Gamas maiores (> 1) tornam a imagem mais escura, evitando o “lavado” causado por brilho excessivo.  
+
+-  **Correção de exibição:**  
+  Essencial para calibrar imagens exibidas em diferentes telas, evitando distorções de luminosidade.  
+
+-  **Visão computacional e machine learning:**  
+  Usado como pré-processamento para melhorar o reconhecimento de padrões e objetos sob diferentes condições de iluminação.
+
+
+<p align="center">
+    <img src="img/gama/gama_exp.png" width="150"/>
+    <img src="img/gama/gama_log.png" width="150"/>
+    <img src="img/gama/gama_quad.png" width="150"/>
+    <img src="img/gama/gama_raiz.png" width="150"/>
+</p>
+
+---
+
