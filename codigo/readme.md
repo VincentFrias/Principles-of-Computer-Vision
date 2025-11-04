@@ -119,3 +119,60 @@ Acima, a imagem da esquerda é a original, que possui baixo contraste e parece "
 No gráfico, o histograma Original (em cinza) mostra que a grande maioria dos pixels está condensada em uma faixa estreita no meio do espectro.
 
 Após a equalização, o histograma Equalizado (em azul) mostra que as frequências dos pixels foram redistribuídas por uma faixa muito mais ampla de intensidades, confirmando o aumento do contraste dinâmico.
+
+---
+
+## Conversão de RGB para HSV e Equalização Baseada em Brilho
+
+O espaço de cor HSV (Hue, Saturation, Value) é uma representação alternativa do modelo RGB, onde a informação de cor e luminosidade são separadas.
+Enquanto no modelo RGB os três canais (vermelho, verde e azul) combinam cor e intensidade, no modelo HSV:
+
+* **H (Hue / Matiz):** representa o tipo de cor (ângulo de 0° a 360° na roda de cores);
+* **S (Saturation / Saturação):** indica o quão "pura" ou intensa é a cor;
+* **V (Value / Brilho):** representa o nível de luminosidade.
+
+Essa separação é extremamente útil em visão computacional, pois permite manipular apenas o brilho (V) sem alterar a coloração natural da imagem.
+
+### 🔹 Conversão Manual de RGB → HSV
+
+O arquivo `convertRGBtoHSV.py` demonstra o processo de conversão manual entre os espaços de cor.
+Cada pixel RGB é convertido para HSV por meio das seguintes etapas:
+
+1.  Normalização dos valores RGB: cada canal é dividido por 255.
+2.  Cálculo dos valores máximo ($\text{max}$) e mínimo ($\text{min}$) entre (R, G, B).
+3.  Determinação de $\Delta = \text{max} - \text{min}$ para definir o matiz (H).
+4.  Cálculo dos componentes (ou variações conforme o canal dominante):
+
+    $$H = 60 \times \left( \frac{g-b}{\Delta} \right)$$ 
+    $$S = \frac{\Delta}{\max(R,G,B)}$$
+    $$V = \max(R,G,B)$$
+
+Após o cálculo, os valores são ajustados para o formato usado pelo OpenCV:
+
+* $H \in [0, 180]$
+* $S, V \in [0, 255]$
+
+### 🔹 Equalização no Canal V (Brilho)
+
+A equalização de histograma é mais eficiente quando aplicada no canal V do modelo HSV, pois ela atua diretamente sobre o brilho da imagem — sem distorcer cores ou tons.
+
+O processo é o seguinte:
+
+1.  Converter a imagem RGB para HSV.
+2.  Separar os canais H, S e V.
+3.  Aplicar a equalização **somente em V**.
+4.  Reunir novamente os três canais (H, S, V).
+5.  Converter de volta para RGB para exibição.
+
+<p align="center"> <img src="img/img02.jpeg" width="300"/> <img src="img/convert/saida_rgb_equalizada.png" width="300"/> <img src="img/convert/saidaHSVtoRGB.png" width="300"/> </p>
+
+A primeira imagem é a fotografia original (retirada do pinterest!)
+A segunda imagem mostra a equalização feita **diretamente em RGB** — que tende a alterar as cores originais.
+A terceita mostra a **equalização via HSV**, preservando tons e aumentando o contraste de forma mais natural.
+
+### 🔹 Importância do HSV para Equalização
+
+* **Evita distorções de cor** causadas pela equalização independente de R, G e B.
+* **Melhora o contraste percebido** sem alterar a aparência geral.
+* **Facilita o pré-processamento** em visão computacional, tornando a imagem mais uniforme para algoritmos de segmentação e detecção.
+* É amplamente usada em aplicações como realce de imagens médicas, processamento de vídeos e análise de cenas com iluminação variável.
