@@ -202,3 +202,42 @@ O arquivo `jaccard.py` implementa uma variação simples do cálculo de similari
 * **Índice de Jaccard (Implementação):** O valor do `jaccard_index` é calculado pela razão entre o número total de pixels semelhantes (`soma`) e o número total de pixels na área de sobreposição (`altura * largura`).
 
 Esta implementação adapta a ideia de similaridade de Jaccard para pixels em escala de cinza, onde o coeficiente representa a **proporção de pixels** que são *aproximadamente* iguais entre as duas imagens.
+
+---
+
+## **Limiarização (Thresholding) e Binarização**
+
+A **limiarização** é uma das técnicas de segmentação mais simples e eficazes no processamento digital de imagens. Seu objetivo é converter uma imagem em escala de cinza em uma **imagem binária** (preto e branco), criando uma separação clara entre as regiões de interesse (objeto) e o fundo (background).
+
+O processo consiste em definir um valor de intensidade de cinza, chamado de **limiar ($T$)**, para separar os pixels:
+* Pixels com intensidade **acima** do limiar ($> T$) são definidos como um valor (geralmente branco/255).
+* Pixels com intensidade **abaixo ou igual** ao limiar ($\le T$) são definidos como o valor oposto (geralmente preto/0).
+
+O arquivo `limiarizaçao.py` demonstra a aplicação de um **Limiar Global Fixo** (T=128), onde o mesmo valor de limiar é aplicado a toda a imagem.
+
+O desafio principal da limiarização é determinar o **valor ideal de $T$**. Uma análise do **histograma** da imagem é crucial, pois ele pode indicar padrões e o contraste, facilitando a escolha de um bom limiar.
+
+### Algoritmo de Otsu (Limiarização Automática)
+
+O método de **Otsu**, proposto por Nobuyuki Otsu em 1979, é um dos algoritmos de limiarização mais populares. Ele é classificado como um método de **limiarização global automática**.
+
+#### **Conceito Principal**
+
+O algoritmo assume que o histograma de uma imagem pode ser dividido em duas classes (grupos): o **objeto (foreground)** e o **fundo (background)**.
+
+A meta de Otsu é **determinar o valor de limiar ($T$)** que melhor separa essas duas classes no histograma, buscando:
+1.  **Minimizar a variância interna das classes** (variância intraclasse).
+2.  **Maximizar a variância entre as classes** (variância interclasse).
+
+#### **Funcionamento**
+
+1.  O algoritmo itera sobre **todos os 256 possíveis valores de intensidade** ($t$) para o limiar.
+2.  Para cada $t$, ele calcula as probabilidades de ocorrência (pesos, $\omega$) e as médias de intensidade ($\mu$) das duas classes formadas (pixels $\le t$ e pixels $> t$).
+3.  Utilizando estas métricas, ele calcula a **variância entre classes** ($\sigma_b^2(t)$):
+    $$\sigma_b^2(t) = \frac{(\mu_t \omega(t) - \mu(t))^2}{\omega(t) (1 - \omega(t))}$$
+    *Essa é a fórmula central utilizada no arquivo `limiarização_otsu.py`.*
+4.  O **Limiar de Otsu** ideal é o valor de $t$ que **maximiza** o valor de $\sigma_b^2(t)$.
+
+O arquivo `limiarização_otsu.py` demonstra a implementação manual deste algoritmo, encontrando o limiar ótimo para binarizar a imagem. Este método é especialmente útil quando a imagem possui **iluminação uniforme e bom contraste** entre o objeto e o fundo.
+
+<p align="center"> <img src="./img/limiar/img_limiarizada.png" width="300" alt="Exemplo de Binarização com Limiar Fixo (T=128)"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="./img/limiar/img_limiarizada_otsu.png" width="300" alt="Exemplo de Binarização com Limiar de Otsu (Limiar Automático)"> </p> <p align="center"> À esquerda: Limiarização Fixo (T=128). | À direita: Limiarização por Otsu (Limiar Automático). </p>
