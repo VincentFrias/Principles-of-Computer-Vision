@@ -1,22 +1,19 @@
 import cv2
 import numpy as np
 
-# Carrega as imagens HSV com 3 canais
-foto1 = cv2.imread("./img/img01.jpeg")  # Assumimos que está em HSV codificado como PNG
-foto2 = cv2.imread("./img/equalization/equalization.png")  # Também com 3 canais
+# Carrega as imagens RGB com 3 canais
+foto1 = cv2.imread("./img/img00.jpeg")  
+foto2 = cv2.imread("./img//img01.jpeg") 
 
 # Verificações de segurança
 if foto1 is None or foto2 is None:
     print("Erro ao carregar uma das imagens.")
     exit()
 
-# Converter de HSV para RGB (se necessário para exibição)
-foto1_rgb = cv2.cvtColor(foto1, cv2.COLOR_BGR2RGB)
-foto2_rgb = cv2.cvtColor(foto2, cv2.COLOR_HSV2RGB)
+# Converter de RGB para GRAY (escala de cinza)
+foto1_gray = cv2.cvtColor(foto1, cv2.COLOR_BGR2GRAY)
+foto2_gray = cv2.cvtColor(foto2, cv2.COLOR_BGR2GRAY)
 
-# Converter de RGB para GRAY para comparação de similaridade
-foto1_gray = cv2.cvtColor(foto1_rgb, cv2.COLOR_RGB2GRAY)
-foto2_gray = cv2.cvtColor(foto2_rgb, cv2.COLOR_RGB2GRAY)
 
 # Ajusta altura e largura para o menor tamanho comum
 altura = min(foto1_gray.shape[0], foto2_gray.shape[0])
@@ -33,8 +30,8 @@ jaccard_index = soma / (altura * largura)
 print(f"Índice de Jaccard: {jaccard_index:.4f}")
 
 # Mostrar as imagens RGB convertidas
-cv2.imshow("Imagem 1 (RGB)", cv2.cvtColor(foto1_rgb, cv2.COLOR_RGB2BGR))
-cv2.imshow("Imagem 2 (RGB)", cv2.cvtColor(foto2_rgb, cv2.COLOR_RGB2BGR))
+cv2.imshow("Imagem 1 (RGB)", cv2.cvtColor(foto1_gray, cv2.COLOR_GRAY2BGR))
+cv2.imshow("Imagem 2 (RGB)", cv2.cvtColor(foto2_gray, cv2.COLOR_GRAY2BGR))
 
 # Fecha a janela quando a tecla 'q' for pressionada
 if cv2.waitKey(0) == ord('q'):
