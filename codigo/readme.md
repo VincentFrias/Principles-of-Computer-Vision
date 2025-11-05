@@ -345,7 +345,7 @@ O processo é o seguinte:
 4.  Reunir novamente os três canais (H, S, V).
 5.  Converter de volta para RGB para exibição.
 
-<p align="center"> <img src="img/img02.jpeg" width="300"/> <img src="img/convert/saida_rgb_equalizada.png" width="300"/> <img src="img/convert/saidaHSVtoRGB.png" width="300"/> </p>
+<p align="center"> <img src="img/img02.jpeg" width="300"/> <img src="img/convert/saida_rgb_equalizada.png" width="300"/> <img src="img/convert/saida_hsv_equalizada.png" width="300"/> </p>
 
 A primeira imagem é a fotografia original (retirada do pinterest!)
 A segunda imagem mostra a equalização feita **diretamente em RGB** — que tende a alterar as cores originais.
