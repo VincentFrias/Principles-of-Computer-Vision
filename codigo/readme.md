@@ -75,7 +75,7 @@ O filtro implementado em `detec_board.py` usa o seguinte *kernel* (componente $G
 
 Em cada pixel, os dois *kernels* dão dois números, $(G_x, G_y)$. Juntos eles formam um **vetor**, uma seta que aponta na direção em que a intensidade **muda mais rápido** (o sinal depende do sentido do *kernel*; aqui, como o `filter2D` faz correlação, ele aponta para o lado que escurece). Esse vetor tem:
 
-* **comprimento** $|G|$: quão forte é a borda ali;
+* **comprimento** $\lvert G \rvert$: quão forte é a borda ali;
 * **direção** $\theta$: para que lado a borda "aponta" (a borda em si fica perpendicular a essa seta).
 
 <p align="center">
@@ -86,15 +86,15 @@ Pense em andar 4 m para o leste ($G_x$) e 3 m para o norte ($G_y$): você andou 
 
 ### 🔹 Cálculo (Definição Matemática)
 
-$$|G| = \sqrt{G_x^2 + G_y^2}$$
+$$\lvert G \rvert = \sqrt{G_x^2 + G_y^2}$$
 
 * **Em uma frase:** o comprimento do vetor gradiente, ou seja, a **força da borda em qualquer direção**.
-* Pixel em região uniforme: $G_x \approx G_y \approx 0$, então $|G| \approx 0$ (preto).
-* Pixel em borda forte: pelo menos um dos dois é grande, então $|G|$ é grande (branco).
+* Pixel em região uniforme: $G_x \approx G_y \approx 0$, então $\lvert G \rvert \approx 0$ (preto).
+* Pixel em borda forte: pelo menos um dos dois é grande, então $\lvert G \rvert$ é grande (branco).
 
 A direção, que o `magnitude.py` não calcula, seria:
 
-$$\theta = \operatorname{atan2}(G_y,\ G_x)$$
+$$\theta = \text{atan2}(G_y,\ G_x)$$
 
 O detector de bordas de **Canny** usa essa magnitude e depois essa orientação para afinar as bordas.
 
@@ -102,7 +102,7 @@ O detector de bordas de **Canny** usa essa magnitude e depois essa orientação 
 
 * **Dois *kernels* de Sobel:** o mesmo *kernel* mostrado na seção anterior para $G_x$, e sua versão transposta para $G_y$.
 * **Por que `cv2.CV_16S`:** o gradiente pode ser **negativo** (a intensidade muda no sentido oposto ao do positivo, por exemplo escuro → claro em vez de claro → escuro), e isso **também é borda**. Com saída `uint8`, o `filter2D` zera os negativos e perde metade das bordas. Com `CV_16S` o sinal é preservado até a conta da magnitude (por isso o `filter2D` aqui usa `CV_16S`, e não o tipo da imagem como em `detec_board.py`).
-* **Magnitude em `float32`:** os valores são elevados ao quadrado, então a conversão evita estouro do `int16` (um $|G_x|$ pode chegar a 1020 e  milhão, muito acima de 32767).
+* **Magnitude em `float32`:** os valores são elevados ao quadrado, então a conversão evita estouro do `int16` (um $\lvert G_x \rvert$ pode chegar a 1020, e $1020^2 \approx 1{,}04$ milhão, muito acima de 32767).
 * **Exibição:** `np.abs` + `np.clip(0, 255)` só para mostrar; valores acima de 255 saturam em branco, então bordas muito fortes ficam todas iguais. Na magnitude o `abs` não é necessário, porque ela já é $\geq 0$.
 * Para salvar as imagens, descomente os `imwrite` em `img/magnitude/`.
 
