@@ -31,7 +31,7 @@
 
 -> Os filtros de realce (também chamados de **Passa-Alta** ou de **Filtros de Gradiente**) enfatizam as regiões de bordas e os ruídos, e não enfatizam regiões constantes ou com variações de intensidade suaves.
 
--> O arquivo `detec_board.py` demonstra a aplicação de um **filtro de detecção de bordas horizontais**, que é um tipo de filtro de primeira derivada:
+-> O arquivo `detec_board.py` demonstra a aplicação de um **filtro de gradiente na direção horizontal** (que realça bordas verticais), um tipo de filtro de primeira derivada:
 
   * **Filtros de Primeira Derivada (Gradiente):** Baseiam-se na primeira derivada espacial da imagem para encontrar bordas.
 
@@ -41,7 +41,7 @@
 
       * **Exemplos Comuns:** Operador **Laplaciano**. O Laplaciano é uma medida isotrópica bidimensional da derivada de segunda ordem. Ele realça transições abruptas de intensidade, como bordas, mas é sensível ao ruído e é frequentemente usado em conjunto com técnicas de suavização (como no Laplaciano do Gaussiano - LoG). O Laplaciano é geralmente mais rápido de ser computado que o Sobel.
 
-O filtro implementado em `detec_board.py` usa o seguinte *kernel* para detecção de bordas horizontais (componente $G_x$, que enfatiza bordas verticais):
+O filtro implementado em `detec_board.py` usa o seguinte *kernel* (componente $G_x$: mede a variação na horizontal, por isso enfatiza bordas verticais):
 
 <p align="center">
     <img src="img/temp/matriz_kernel.png" width="250"/>
@@ -50,6 +50,61 @@ O filtro implementado em `detec_board.py` usa o seguinte *kernel* para detecçã
 * Este *kernel* corresponde ao filtro de Sobel na direção $x$.
 
 * A demonstração em `detec_board.py` compara a aplicação do filtro usando a função `cv2.filter2D` e uma implementação manual com *loop* e *padding*. A implementação manual inclui a conversão para `np.int16` para permitir valores negativos do gradiente (diferença) antes do *clip* e conversão final para `np.uint8`.
+
+---
+
+## **Magnitude do Gradiente (Sobel em x e y)**
+
+-> Um único *kernel* de Sobel só enxerga **uma direção**. O $G_x$ responde a variações na horizontal e quase ignora linhas horizontais; o $G_y$ faz o oposto. Para ter o mapa de bordas completo, precisamos juntar os dois, e é isso que o arquivo `magnitude.py` faz.
+
+<p align="center">
+    <img src="img/magnitude/gx.png" width="250"/>
+    <img src="img/magnitude/gy.png" width="250"/>
+    <img src="img/magnitude/magnitude.png" width="250"/>
+</p>
+
+<p align="center"><i>Gx, Gy e magnitude, calculados na mesma foto.</i></p>
+
+### 🔹 Como ler as imagens
+
+* $G_x$ = variação **na horizontal** (esquerda → direita) → destaca as bordas **verticais** (as laterais dos prédios).
+* $G_y$ = variação **na vertical** (cima → baixo) → destaca as bordas **horizontais** (os andares, o topo dos telhados).
+* **Magnitude** = combinação dos dois: aparecem as bordas de todas as orientações, inclusive as diagonais, que ficam em parte em cada um.
+
+### 🔹 O gradiente é um vetor
+
+Em cada pixel, os dois *kernels* dão dois números, $(G_x, G_y)$. Juntos eles formam um **vetor**, uma seta que aponta na direção em que a intensidade **muda mais rápido** (o sinal depende do sentido do *kernel*; aqui, como o `filter2D` faz correlação, ele aponta para o lado que escurece). Esse vetor tem:
+
+* **comprimento** $|G|$: quão forte é a borda ali;
+* **direção** $\theta$: para que lado a borda "aponta" (a borda em si fica perpendicular a essa seta).
+
+<p align="center">
+    <img src="img/magnitude/vetor_gradiente.png" width="350"/>
+</p>
+
+Pense em andar 4 m para o leste ($G_x$) e 3 m para o norte ($G_y$): você andou 5 m em linha reta. $G_x$ e $G_y$ são os dois catetos, e a magnitude é a hipotenusa (Pitágoras).
+
+### 🔹 Cálculo (Definição Matemática)
+
+$$|G| = \sqrt{G_x^2 + G_y^2}$$
+
+* **Em uma frase:** o comprimento do vetor gradiente, ou seja, a **força da borda em qualquer direção**.
+* Pixel em região uniforme: $G_x \approx G_y \approx 0$, então $|G| \approx 0$ (preto).
+* Pixel em borda forte: pelo menos um dos dois é grande, então $|G|$ é grande (branco).
+
+A direção, que o `magnitude.py` não calcula, seria:
+
+$$\theta = \operatorname{atan2}(G_y,\ G_x)$$
+
+O detector de bordas de **Canny** usa essa magnitude e depois essa orientação para afinar as bordas.
+
+### 🔹 Aplicação em Imagens (`magnitude.py`)
+
+* **Dois *kernels* de Sobel:** o mesmo *kernel* mostrado na seção anterior para $G_x$, e sua versão transposta para $G_y$.
+* **Por que `cv2.CV_16S`:** o gradiente pode ser **negativo** (a intensidade muda no sentido oposto ao do positivo, por exemplo escuro → claro em vez de claro → escuro), e isso **também é borda**. Com saída `uint8`, o `filter2D` zera os negativos e perde metade das bordas. Com `CV_16S` o sinal é preservado até a conta da magnitude (por isso o `filter2D` aqui usa `CV_16S`, e não o tipo da imagem como em `detec_board.py`).
+* **Magnitude em `float32`:** os valores são elevados ao quadrado, então a conversão evita estouro do `int16` (um $|G_x|$ pode chegar a 1020 e  milhão, muito acima de 32767).
+* **Exibição:** `np.abs` + `np.clip(0, 255)` só para mostrar; valores acima de 255 saturam em branco, então bordas muito fortes ficam todas iguais. Na magnitude o `abs` não é necessário, porque ela já é $\geq 0$.
+* Para salvar as imagens, descomente os `imwrite` em `img/magnitude/`.
 
 ---
 
